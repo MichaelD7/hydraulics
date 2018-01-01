@@ -3,7 +3,8 @@ import channel
 """enter flow, width, depth, length, us invert, ds invert, Ks, kinematic viscocity"""
 # channel1 = channel.Channel(0.5, 1.0, 2.0, 100, 0.1, 0.0, 0.003, 1.141e-06, 0.4)
 print("Test Run 1")
-channel1 = channel.Channel(0.5, 0.8, 2, 100.0, 1.0, 0.9, 0.003, 1.141e-06)
+channel1 = channel.Channel()
+channel1.setValues(0.5, 0.8, 2, 100.0, 1.0, 0.9, 0.003, 1.141e-06)
 # print(channel1.critical_depth())
 # print(channel1.normal_depth())
 # crit_depth = channel1.critical_depth()
@@ -17,7 +18,7 @@ for i in channel1.chainage:
     x += 1
 
 print("Test Run 2")
-channel1 = channel.Channel(0.5, 0.8, 3, 100.0, 1.0, 0.9, 0.003, 1.141e-06, 0.5)
+channel1.setValues(0.5, 0.8, 3, 100.0, 1.0, 0.9, 0.003, 1.141e-06, 0.5)
 # print(channel1.critical_depth())
 # print(channel1.normal_depth())
 # crit_depth = channel1.critical_depth()

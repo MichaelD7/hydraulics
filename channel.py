@@ -8,24 +8,50 @@ class Channel:
     precision = 0.0001
     MAX_ITER = 29
 
-    def __init__(self, flow, width, depth, length, us_il, ds_il, Ks, kinvisc, ds_depth=0, open_chan=True):
-        self.flow = flow
-        self.width = width
-        self.depth = depth
-        self.length = length
-        self.us_invert = us_il
-        self.ds_invert = ds_il
-        self.slope = (self.us_invert - self.ds_invert) / self.length
-        self.Ks = Ks
-        self.kinvisc = kinvisc
-        self.ds_depth = ds_depth
+    def __init__(self):
+        self.flow = None
+        self.width = None
+        self.depth = None
+        self.length = None
+        self.us_invert = None
+        self.ds_invert = None
+        self.slope = None
+        self.Ks = None
+        self.kinvisc = None
+        self.ds_depth = None
         self.chainage = []
         self.energy = []
         self.water = []
         self.head = []
         self.crit_depth = 0.0
         self.norm_depth = 0.0
+        self.open_chan = None
+
+
+    def setValues(self, flow, width, depth, length, us_il, ds_il, Ks, kinvisc, ds_depth=0, open_chan=True):
+        self.flow = self.checkValues(flow, True)
+        self.width = self.checkValues(width, True)
+        self.depth = self.checkValues(depth, True)
+        self.length = self.checkValues(length, True)
+        self.us_invert = self.checkValues(us_il)
+        self.ds_invert = self.checkValues(ds_il)
+        self.slope = (self.us_invert - self.ds_invert) / self.length
+        self.Ks = self.checkValues(Ks, True)
+        self.kinvisc = self.checkValues(kinvisc, True)
+        self.ds_depth = self.checkValues(ds_depth, True)
         self.open_chan = open_chan
+
+    def checkValues(self, checkValue, non_negative=False):
+        # change to static method
+        try:
+            checkValue = float(checkValue)
+            if non_negative:
+                if checkValue < 0:
+                    raise ValueError("Can't be negative")
+        except ValueError as e:
+            print("can't be negative")
+            pass
+        return checkValue
 
     def critical_depth(self):
         """calculate critical depth for channel"""
@@ -102,18 +128,18 @@ class Channel:
                 self.head.append(self.ds_invert + water_depth)
             elif water_depth > self.depth:
                 delta_L = i * (self.length / 100.0)
-                print(delta_L, water_depth)
+                # print(delta_L, water_depth)
                 wet_perimeter = 2 * (self.width + self.depth)
                 area = self.width * self.depth
                 hyd_radius = area / wet_perimeter
                 velocity = self.flow / area
                 E0 = water_depth + (velocity**2 / (2 * Channel.g))
-                print(E0)
+                # print(E0)
                 friction_factor = self.colebrook_white(hyd_radius, velocity)
                 Sf = friction_factor * velocity**2 / (8.0 * Channel.g * hyd_radius)
                 E_upstream = E0 + delta_L * Sf
                 water_depth = E_upstream - velocity**2 / (2 * Channel.g)
-                print(water_depth)
+                # print(water_depth)
                 E_previous = E_upstream
                 E2 = E_previous
                 Sf_previous = Sf
@@ -176,7 +202,7 @@ class Channel:
             self.crit_depth = self.critical_depth()
             # calculate normal depth
             self.norm_depth = self.normal_depth()
-            print(self.slope)
+            # print(self.slope)
             # TODO figure out how to handle downstream depth greater than normal depth
     #        if self.ds_depth > self.norm_depth:
     #            return
