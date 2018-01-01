@@ -36,7 +36,7 @@ class Channel:
         """calculate normal depth for channel"""
         # check for flat slope
         if self.slope <= 0.0001:
-            return 999  # was -1
+            raise ValueError("flat slope")
         upper = self.depth
         lower = 0.0
         solution = False
@@ -57,7 +57,8 @@ class Channel:
         return normal_depth
 
     def colebrook_white(self, hydraulic_radius, vel_norm):
-        """calculate colebrook-white friction factor. Start with guess value."""
+        """calculate colebrook-white friction factor.
+        Start with guess value."""
         guess = 0.02  # change to approximation to colebrook-white to reduce iteration
         dia = 4.0 * hydraulic_radius
         Re = dia * vel_norm / self.kinvisc
@@ -164,22 +165,28 @@ class Channel:
                 self.energy.append(self.ds_invert + delta_chain * self.slope + E2)
                 self.water.append(water_depth)
                 self.head.append(self.ds_invert + delta_chain * self.slope + water_depth)
-                print("Friction: %.4f" % friction_factor, end=' ')
+                print("Friction: %.4f" % friction_factor)
                 print("Length %.1f" % delta_chain, "E2: %.3f" % E_previous, " Sf: %.3f" % Sf_previous)
         return E2
 
     def calculate(self):
-        # TODO validate data
-        # calculate critical depth
-        self.crit_depth = self.critical_depth()
-        # calculate normal depth
-        self.norm_depth = self.normal_depth()
-        print(self.slope)
-        # TODO figure out how to handle downstream depth greater than normal depth
-#        if self.ds_depth > self.norm_depth:
-#            return
-        if self.norm_depth > self.crit_depth:
-            self.backwater()
+        try:
+            # TODO validate data
+            # calculate critical depth
+            self.crit_depth = self.critical_depth()
+            # calculate normal depth
+            self.norm_depth = self.normal_depth()
+            print(self.slope)
+            # TODO figure out how to handle downstream depth greater than normal depth
+    #        if self.ds_depth > self.norm_depth:
+    #            return
+            if self.norm_depth > self.crit_depth:
+                self.backwater()
+        except ValueError as e:
+            print(e)
+            pass
+        except:
+            pass
 
 
 #main
