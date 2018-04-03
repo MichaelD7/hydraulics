@@ -1,5 +1,5 @@
 import math
-
+import friction
 
 class Channel:
     """set step lengths, define defaults"""
@@ -28,7 +28,9 @@ class Channel:
         self.open_chan = None
 
 
-    def setValues(self, flow, width, depth, length, us_il, ds_il, Ks, kinvisc, ds_depth=0, open_chan=True):
+
+    def setValues(self, flow, width, depth, length, us_il, ds_il, Ks, kinvisc,
+     ds_depth=0, open_chan=True):
         self.flow = self.checkValues(flow, True)
         self.width = self.checkValues(width, True)
         self.depth = self.checkValues(depth, True)
@@ -40,6 +42,7 @@ class Channel:
         self.kinvisc = self.checkValues(kinvisc, True)
         self.ds_depth = self.checkValues(ds_depth, True)
         self.open_chan = open_chan
+        self.friction_formula = friction.DarcyWeisbach(self.Ks, self.kinvisc)
 
     def checkValues(self, checkValue, non_negative=False):
         # change to static method
@@ -55,12 +58,14 @@ class Channel:
 
     def frictionSlope(self, hyd_radius, velocity):
         friction_factor = self.colebrook_white(hyd_radius, velocity)
-        friction_slope = friction_factor * velocity * velocity / (8.0 * Channel.g * hyd_radius)
+        friction_slope = friction_factor * velocity * velocity / (
+            8.0 * Channel.g * hyd_radius)
         return friction_slope
 
     def critical_depth(self):
         """calculate critical depth for channel"""
-        crit_depth = math.pow((self.flow**2 / (self.width **2 * Channel.g)), (1/3))
+        crit_depth = math.pow((self.flow**2 /
+            (self.width **2 * Channel.g)), (1/3))
         return crit_depth
 
     def normal_depth(self):
@@ -78,7 +83,8 @@ class Channel:
             vel_norm = self.flow / (self.width * normal_depth)
             hydraulic_radius = area / perimeter
             friction_factor = self.colebrook_white(hydraulic_radius, vel_norm)
-            calc_flow = math.pow((self.slope * 4.0 * hydraulic_radius * area * area * 2.0 * Channel.g / friction_factor), 0.5)
+            calc_flow = math.pow((self.slope * 4.0 * hydraulic_radius *
+                area * area * 2.0 * Channel.g / friction_factor), 0.5)
             if math.fabs(self.flow - calc_flow) < Channel.precision:
                 solution = True
             elif calc_flow > self.flow:
@@ -90,12 +96,13 @@ class Channel:
     def colebrook_white(self, hydraulic_radius, vel_norm):
         """calculate colebrook-white friction factor.
         Start with guess value."""
-        guess = 0.02  # change to approximation to colebrook-white to reduce iteration
+        guess = 0.02  # change to approximation to c-w to reduce iteration
         dia = 4.0 * hydraulic_radius
         # Re = dia * vel_norm / self.kinvisc
         solution = False
         while not solution:
-            friction = 0.25 * math.pow(math.log10(self.Ks / (3.7 * dia) + 2.51 / (vel_norm * dia / self.kinvisc * math.sqrt(guess))),-2)
+            friction = 0.25 * math.pow(math.log10(self.Ks / (3.7 * dia) +
+                2.51 / (vel_norm * dia / self.kinvisc * math.sqrt(guess))),-2)
             if math.fabs(friction - guess) < Channel.precision:
                 solution = True
             else:
@@ -123,7 +130,7 @@ class Channel:
                 velocity = self.flow / area
                 E0 = water_depth + (velocity**2 / (2 * Channel.g))
                 # Sf = slope of hydraulic gradient
-                Sf = self.frictionSlope(hyd_radius, velocity)
+                Sf = self.friction_formula.frictionSlope(hyd_radius, velocity)
                 # print("E0: %.3f" % E0, " Sf: %.3f" % Sf)
                 E_previous = E0
                 Sf_previous = Sf
@@ -137,7 +144,7 @@ class Channel:
                 velocity = self.flow / area
                 E0 = water_depth + (velocity**2 / (2 * Channel.g))
                 # print(E0)
-                Sf = self.frictionSlope(hyd_radius, velocity)
+                Sf = self.friction_formula.frictionSlope(hyd_radius, velocity)
                 E_upstream = E0 + delta_L * Sf
                 water_depth = E_upstream - velocity**2 / (2 * Channel.g)
                 # print(water_depth)
@@ -161,7 +168,7 @@ class Channel:
                     hyd_radius = area / wet_perimeter
                     velocity = self.flow / area
                     E_upstream = water_depth + (velocity**2 / (2 * Channel.g))
-                    Sf = self.frictionSlope(hyd_radius, velocity)
+                    Sf = self.friction_formula.frictionSlope(hyd_radius, velocity)
                     Sf_mean = (Sf + Sf_previous) / 2.0
                     E2 = E_previous - delta_L * (self.slope - Sf_mean)
                     # print("check", E_upstream, E2)
@@ -190,7 +197,8 @@ class Channel:
         self.chainage.append(delta_chain)
         self.energy.append(self.ds_invert + delta_chain * self.slope + energy)
         self.water.append(water_depth)
-        self.head.append(self.ds_invert + delta_chain * self.slope + water_depth)
+        self.head.append(self.ds_invert +
+            delta_chain * self.slope + water_depth)
 
     def clearResults(self):
         del self.chainage[:]
