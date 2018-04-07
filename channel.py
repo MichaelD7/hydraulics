@@ -26,6 +26,7 @@ class Channel:
         self.crit_depth = 0.0
         self.norm_depth = 0.0
         self.open_chan = None
+        self.friction_formula = None
 
 
 
@@ -56,12 +57,6 @@ class Channel:
             pass
         return checkValue
 
-    def frictionSlope(self, hyd_radius, velocity):
-        friction_factor = self.colebrook_white(hyd_radius, velocity)
-        friction_slope = friction_factor * velocity * velocity / (
-            8.0 * Channel.g * hyd_radius)
-        return friction_slope
-
     def critical_depth(self):
         """calculate critical depth for channel"""
         crit_depth = math.pow((self.flow**2 /
@@ -82,7 +77,8 @@ class Channel:
             perimeter = self.width + 2.0 * normal_depth
             vel_norm = self.flow / (self.width * normal_depth)
             hydraulic_radius = area / perimeter
-            friction_factor = self.colebrook_white(hydraulic_radius, vel_norm)
+            friction_factor = self.friction_formula.friction_factor(
+                hydraulic_radius, vel_norm)
             calc_flow = math.pow((self.slope * 4.0 * hydraulic_radius *
                 area * area * 2.0 * Channel.g / friction_factor), 0.5)
             if math.fabs(self.flow - calc_flow) < Channel.precision:
@@ -92,22 +88,6 @@ class Channel:
             else:
                 lower = normal_depth
         return normal_depth
-
-    def colebrook_white(self, hydraulic_radius, vel_norm):
-        """calculate colebrook-white friction factor.
-        Start with guess value."""
-        guess = 0.02  # change to approximation to c-w to reduce iteration
-        dia = 4.0 * hydraulic_radius
-        # Re = dia * vel_norm / self.kinvisc
-        solution = False
-        while not solution:
-            friction = 0.25 * math.pow(math.log10(self.Ks / (3.7 * dia) +
-                2.51 / (vel_norm * dia / self.kinvisc * math.sqrt(guess))),-2)
-            if math.fabs(friction - guess) < Channel.precision:
-                solution = True
-            else:
-                guess += (friction - guess) / 2.0
-        return friction
 
     def backwater(self):
         """calculate back water profile. Calculate zero distance values,

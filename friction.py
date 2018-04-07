@@ -12,12 +12,16 @@ class FrictionLoss:
     def frictionSlope(self, hydraulic_radius, velocity):
         pass
 
+    @abstractmethod
+    def friction_factor(self, hydraulic_radius, velocity):
+        pass
+
 class DarcyWeisbach(FrictionLoss):
     def __init__(self, roughness, kinvisc):
         self.roughness = roughness
         self.kinvisc = kinvisc
 
-    def colebrook_white(self, hydraulic_radius, velocity):
+    def friction_factor(self, hydraulic_radius, velocity):
         """calculate colebrook-white friction factor.
         Start with guess value."""
         guess = 0.02  # change to approximation to c-w to reduce iteration
@@ -34,7 +38,7 @@ class DarcyWeisbach(FrictionLoss):
         return friction
 
     def frictionSlope(self, hydraulic_radius, velocity):
-        friction_factor = self.colebrook_white(hydraulic_radius, velocity)
-        friction_slope = friction_factor * velocity * velocity / (
+        frictionFactor = self.friction_factor(hydraulic_radius, velocity)
+        friction_slope = frictionFactor * velocity * velocity / (
             8.0 * FrictionLoss.g * hydraulic_radius)
         return friction_slope
