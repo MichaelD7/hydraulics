@@ -3,7 +3,8 @@ import friction
 
 class Channel:
     """set step lengths, define defaults"""
-    step = (0, 0.625, 0.625, 1.25, 2.5, 2.5, 5, 5, 10, 10, 10, 10, 10, 10, 10, 10, 2.5)
+    step = (0, 0.625, 0.625, 1.25, 2.5, 2.5, 5, 5, 10,
+        10, 10, 10, 10, 10, 10, 10, 2.5)
     g = 9.806   # gravitational constant
     precision = 0.0001
     MAX_ITER = 29
