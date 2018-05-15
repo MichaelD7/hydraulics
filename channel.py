@@ -1,7 +1,7 @@
-import math
+import conduit
 import friction
 
-class Channel:
+class Channel(Conduit):
     """set step lengths, define defaults"""
     step = (0, 0.625, 0.625, 1.25, 2.5, 2.5, 5, 5, 10,
         10, 10, 10, 10, 10, 10, 10, 2.5)
