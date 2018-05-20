@@ -10,11 +10,13 @@ class Channel(conduit.Conduit):
 
 
     def setValues(self, flow, width, depth,length, us_il,
-        ds_il, Ks, kinvisc, ds_depth=0, open_chan=True):
-        super().setValues(flow, length, us_il, ds_il, Ks, kinvisc,
-        ds_depth, open_chan)
+        ds_il, Ks, kinvisc, ds_depth=0, open_chan=True,
+        friction_formula="DWCW"):
         self.width = self.checkValues(width, True)
         self.depth = self.checkValues(depth, True)
+        super().setValues(flow, length, us_il, ds_il, Ks, kinvisc,
+        ds_depth, open_chan, friction_formula)
+
 
     def critical_depth(self):
         """calculate critical depth for channel"""

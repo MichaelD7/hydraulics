@@ -23,6 +23,7 @@ class Conduit:
         self.Ks = None
         self.kinvisc = None
         self.ds_depth = None
+        self.maxdepth = None
         self.chainage = []
         self.energy = []
         self.water = []
@@ -35,7 +36,7 @@ class Conduit:
 
 
     def setValues(self, flow, length, us_il, ds_il, Ks, kinvisc,
-     ds_depth=0, open_chan=True):
+     ds_depth=0, open_chan=True, friction_formula="DWCW"):
         self.flow = self.checkValues(flow, True)
     #    self.width = self.checkValues(width, True)
     #    self.depth = self.checkValues(depth, True)
@@ -47,7 +48,13 @@ class Conduit:
         self.kinvisc = self.checkValues(kinvisc, True)
         self.ds_depth = self.checkValues(ds_depth, True)
         self.open_chan = open_chan
-        self.friction_formula = friction.DarcyWeisbach(self.Ks, self.kinvisc)
+        self.friction_formula = self.setFrictionModel(friction_formula)
+        self.maxdepth = self.max_depth()
+
+    def setFrictionModel(self, friction_formula):
+        if friction_formula == "DWCW":
+            friction_model = friction.DarcyWeisbach(self.Ks, self.kinvisc)
+        return friction_model
 
     def checkValues(self, checkValue, non_negative=False):
         # change to static method
@@ -91,7 +98,7 @@ class Conduit:
         # check for flat slope
         if self.slope <= 0.0001:
             raise ValueError("check slope")
-        upper = self.max_depth()
+        upper = self.maxdepth
         lower = 0.0
         solution = False
         while not solution:
@@ -123,7 +130,9 @@ class Conduit:
         for i in Conduit.step:
             if i == 0:
                 # check for conduit full
-                if water_depth > self.max_depth():
+                if water_depth > self.maxdepth:
+                    if self.open_chan:
+                        raise ValueError("over tops")
                     wet_perimeter = self.conduitPerimeter()
                     area = self.conduitArea()
                 else:
@@ -138,7 +147,9 @@ class Conduit:
                 E_previous = E0
                 Sf_previous = Sf
                 self.updateResults(0, E0, water_depth)
-            elif water_depth >= self.max_depth():
+            elif water_depth >= self.maxdepth:
+                if self.open_chan:
+                    raise ValueError("over tops")
                 delta_L = i * (self.length / 100.0)
                 # print(delta_L, water_depth)
                 wet_perimeter = self.conduitPerimeter()
@@ -150,6 +161,8 @@ class Conduit:
                 Sf = self.friction_formula.frictionSlope(hyd_radius, velocity)
                 E_upstream = E0 + delta_L * Sf
                 water_depth = E_upstream - velocity**2 / (2 * Conduit.g)
+                if water_depth > self.maxdepth and self.open_chan:
+                    raise ValueError("over tops")
                 # print(water_depth)
                 E_previous = E_upstream
                 E2 = E_previous
@@ -159,7 +172,7 @@ class Conduit:
                 self.updateResults(delta_chain, E2, water_depth)
             else:
                 delta_L = i * (self.length / 100.0)
-                upper = self.max_depth()
+                upper = self.maxdepth
                 lower = previous_depth
 
                 solution = False
@@ -228,17 +241,3 @@ class Conduit:
             pass
         except:
             pass
-
-
-#main
-#"""enter flow, width, depth, length, us invert, ds invert, Ks, kinematic viscocity"""
-#channel1 = Channel(0.5, 0.8, 2.0, 100, 1.0, 0.9, 0.003, 1.141e-06)
-#print(channel1.critical_depth())
-#print(channel1.normal_depth())
-#crit_depth = channel1.critical_depth()
-#channel1.backwater(crit_depth)
-#print(channel1.chainage[0], channel1.energy[0], channel1.water[0], channel1.head[0])
-#x = 0
-#for i in channel1.chainage:
-#    print("Length %.1f" % i, "Energy %.3f" % channel1.energy[x], "Water %.3f" % channel1.water[x], "Head %.3f" % channel1.head[x])
-#    x += 1
