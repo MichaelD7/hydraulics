@@ -70,7 +70,7 @@ class Conduit:
 
     @abstractmethod
     def critical_depth(self):
-        """calculate critical depth for channel"""
+        """calculate critical depth for conduit"""
         pass
 
     @abstractmethod

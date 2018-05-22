@@ -10,7 +10,7 @@ class Pipe(conduit.Conduit):
 
     def setValues(self, flow, diameter, length, us_il, ds_il,
         Ks, kinvisc, ds_depth=0, open_chan=False, friction_formula="DWCW"):
-        self.diameter = diameter
+        self.diameter = self.checkValues(diameter, True)
         super().setValues(flow, length, us_il, ds_il, Ks, kinvisc,
         ds_depth, open_chan, friction_formula)
 
