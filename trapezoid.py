@@ -17,24 +17,6 @@ class Trapezoid(conduit.Conduit):
         super().setValues(flow, length, us_il, ds_il, Ks, kinvisc,
         ds_depth, open_chan, friction_formula)
 
-    def critical_depth(self):
-        """Calculate critical depth for trapezoid"""
-        upper = self.maxdepth
-        lower = 0.0
-        solution = False
-        while not solution:
-            Hcrit = (upper + lower) / 2.0
-            area = self.getFlowArea(Hcrit)
-            top_width = self.getFlowTopWidth(Hcrit)
-            froude = self.flow**2 * top_width / (Trapezoid.g * area**3)
-            if math.fabs(froude - 1.0) < Trapezoid.precision:
-                solution = True
-            elif froude > 1.0:
-                lower = Hcrit
-            else:
-                upper = Hcrit
-        return Hcrit
-
     def max_depth(self):
         return self.depth
 
@@ -42,12 +24,12 @@ class Trapezoid(conduit.Conduit):
         area = depth * (self.width + self.side_slope * depth)
         return area
 
-    def getFlowPerimeter(self, depth=0):
+    def getFlowPerimeter(self, depth):
         perimeter = self.width + (2.0 * depth *
         math.sqrt(1.0 + self.side_slope**2))
         return perimeter
 
-    def getFlowTopWidth(self, depth=0):
+    def getFlowTopWidth(self, depth):
         topWidth = self.width + 2.0 * self.side_slope * depth
         return topWidth
 

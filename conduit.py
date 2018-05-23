@@ -68,10 +68,24 @@ class Conduit:
             pass
         return checkValue
 
-    @abstractmethod
+
     def critical_depth(self):
-        """calculate critical depth for conduit"""
-        pass
+        """Calculate critical depth"""
+        upper = self.maxdepth
+        lower = 0.0
+        solution = False
+        while not solution:
+            Hcrit = (upper + lower) / 2.0
+            area = self.getFlowArea(Hcrit)
+            top_width = self.getFlowTopWidth(Hcrit)
+            froude = self.flow**2 * top_width / (Conduit.g * area**3)
+            if math.fabs(froude - 1.0) < Conduit.precision:
+                solution = True
+            elif froude > 1.0:
+                lower = Hcrit
+            else:
+                upper = Hcrit
+        return Hcrit
 
     @abstractmethod
     def max_depth(self):
@@ -86,6 +100,10 @@ class Conduit:
         pass
 
     @abstractmethod
+    def getFlowTopWidth(self, depth):
+        pass
+
+    @abstractmethod
     def conduitArea(self):
         pass
 
@@ -94,7 +112,7 @@ class Conduit:
         pass
 
     def normal_depth(self):
-        """calculate normal depth for channel"""
+        """calculate normal depth for conduit"""
         # check for flat slope
         if self.slope <= 0.0001:
             raise ValueError("check slope")

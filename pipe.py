@@ -14,24 +14,6 @@ class Pipe(conduit.Conduit):
         super().setValues(flow, length, us_il, ds_il, Ks, kinvisc,
         ds_depth, open_chan, friction_formula)
 
-    def critical_depth(self):
-        """Calculate critical depth for pipe"""
-        upper = self.maxdepth
-        lower = 0.0
-        solution = False
-        while not solution:
-            Hcrit = (upper + lower) / 2.0
-            area = self.getFlowArea(Hcrit)
-            top_width = self.getFlowTopWidth(Hcrit)
-            froude = self.flow**2 * top_width / (Pipe.g * area**3)
-            if math.fabs(froude - 1.0) < Pipe.precision:
-                solution = True
-            elif froude > 1.0:
-                lower = Hcrit
-            else:
-                upper = Hcrit
-        return Hcrit
-
     def partPipe(self, guess_depth):
         """calculate angle based on guessed depth of flow"""
         radius = self.diameter / 2.0

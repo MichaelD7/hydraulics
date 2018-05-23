@@ -17,7 +17,7 @@ class Channel(conduit.Conduit):
         super().setValues(flow, length, us_il, ds_il, Ks, kinvisc,
         ds_depth, open_chan, friction_formula)
 
-
+#override base class, but not needed
     def critical_depth(self):
         """calculate critical depth for channel"""
         crit_depth = math.pow((self.flow**2 /
@@ -32,6 +32,9 @@ class Channel(conduit.Conduit):
 
     def getFlowPerimeter(self, depth):
         return self.width + 2.0 * depth
+
+    def getFlowTopWidth(self, depth):
+        return self.width
 
     def getConduitArea(self):
         return self.width * self.depth
