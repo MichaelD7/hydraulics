@@ -10,12 +10,13 @@ class Trapezoid(conduit.Conduit):
         super().__init__()
 
     def setValues(self, flow, width, depth, side_slope, length, us_il, ds_il,
-        Ks, kinvisc, ds_depth=0, open_chan=False, friction_formula="DWCW"):
+        Ks, kinvisc, ds_depth=0, open_chan=False, friction_formula="DWCW",
+        us_K=0, ds_K=0):
         self.width = self.checkValues(width, True)
         self.depth = self.checkValues(depth, True)
         self.side_slope = self.checkValues(side_slope, True)
         super().setValues(flow, length, us_il, ds_il, Ks, kinvisc,
-        ds_depth, open_chan, friction_formula)
+        ds_depth, open_chan, friction_formula, us_k, ds_K)
 
     def max_depth(self):
         return self.depth

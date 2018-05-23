@@ -18,7 +18,7 @@ for i in channel1.chainage:
     x += 1
 
 print("Test Run 2")
-channel1.setValues(0.5, 0.8, 3, 100.0, 1.0, 0.9, 0.003, 1.141e-06, 0.5)
+channel1.setValues(0.5, 0.8, 3, 100.0, 1.0, 0.9, 0.003, 1.141e-06, 0.5, True, "DWCW", 0, 0)
 # print(channel1.critical_depth())
 # print(channel1.normal_depth())
 # crit_depth = channel1.critical_depth()

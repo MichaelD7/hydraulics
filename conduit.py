@@ -32,11 +32,17 @@ class Conduit:
         self.norm_depth = 0.0
         self.open_chan = None
         self.friction_formula = None
+        self.us_K = None
+        self.ds_K = None
+        self.us_discont = None
+        self.ds_discont = None
+        self.us_velocity = None
+        self.ds_velocity = None
 
 
 
     def setValues(self, flow, length, us_il, ds_il, Ks, kinvisc,
-     ds_depth=0, open_chan=True, friction_formula="DWCW"):
+     ds_depth=0, open_chan=True, friction_formula="DWCW", us_K=0, ds_K=0):
         self.flow = self.checkValues(flow, True)
     #    self.width = self.checkValues(width, True)
     #    self.depth = self.checkValues(depth, True)
@@ -50,6 +56,9 @@ class Conduit:
         self.open_chan = open_chan
         self.friction_formula = self.setFrictionModel(friction_formula)
         self.maxdepth = self.max_depth()
+        # allow negatives?
+        self.us_K = self.checkValues(us_K)
+        self.ds_K = self.checkValues(ds_K)
 
     def setFrictionModel(self, friction_formula):
         if friction_formula == "DWCW":
@@ -158,7 +167,11 @@ class Conduit:
                     area = self.getFlowArea(water_depth)
                 hyd_radius = area / wet_perimeter
                 velocity = self.flow / area
-                E0 = water_depth + (velocity**2 / (2 * Conduit.g))
+                self.ds_velocity = velocity
+                self.ds_discont = self.ds_K * (self.ds_velocity**2 /
+                    (2 * Conduit.g))
+                E0 = water_depth + (velocity**2 /
+                    (2 * Conduit.g)) + self.ds_discont
                 # Sf = slope of hydraulic gradient
                 Sf = self.friction_formula.frictionSlope(hyd_radius, velocity)
                 # print("E0: %.3f" % E0, " Sf: %.3f" % Sf)
@@ -225,6 +238,12 @@ class Conduit:
                 self.updateResults(delta_chain, E2, water_depth)
                 # print("Friction: %.4f" % friction_factor)
                 # print("Length %.1f" % delta_chain, "E2: %.3f" % E_previous, " Sf: %.3f" % Sf_previous)
+        self.us_velocity = velocity
+        if self.us_K:
+            self.us_discont = self.us_K * (self.us_velocity**2 /
+                (2 * Conduit.g))
+            E2 += self.us_discont
+            self.updateResults(delta_chain, E2, water_depth)
         return E2
 
     def updateResults(self, delta_chain, energy, water_depth):
