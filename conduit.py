@@ -273,6 +273,8 @@ class Conduit:
             if self.norm_depth > self.crit_depth:
                 self.clearResults()
                 self.backwater()
+            else:
+                print("supercritical calc to be added")
         except ValueError as e:
             print(e)
             pass
