@@ -124,7 +124,8 @@ class Conduit:
         """calculate normal depth for conduit"""
         # check for flat slope
         if self.slope <= 0.0001:
-            raise ValueError("check slope")
+            # raise ValueError("check slope")
+            return None
         upper = self.maxdepth
         lower = 0.0
         solution = False
@@ -270,7 +271,10 @@ class Conduit:
             # TODO figure out how to handle downstream depth greater than normal depth
     #        if self.ds_depth > self.norm_depth:
     #            return
-            if self.norm_depth > self.crit_depth:
+            if self.norm_depth is None:
+                self.clearResults()
+                self.backwater()
+            elif self.norm_depth > self.crit_depth:
                 self.clearResults()
                 self.backwater()
             else:
@@ -279,4 +283,5 @@ class Conduit:
             print(e)
             pass
         except:
+            print("error")
             pass
