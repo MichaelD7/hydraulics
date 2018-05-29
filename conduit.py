@@ -126,7 +126,8 @@ class Conduit:
         if self.slope <= 0.0001:
             # raise ValueError("check slope")
             return None
-        upper = self.maxdepth
+        # include loop counter, need better way than 2 x max depth. not good
+        upper = 2.0 * self.maxdepth
         lower = 0.0
         solution = False
         while not solution:
@@ -160,7 +161,7 @@ class Conduit:
                 # check for conduit full
                 if water_depth > self.maxdepth:
                     if self.open_chan:
-                        raise ValueError("over tops")
+                        raise ValueError("over tops past ch. " + str(delta_chain))
                     wet_perimeter = self.conduitPerimeter()
                     area = self.conduitArea()
                 else:
@@ -181,7 +182,7 @@ class Conduit:
                 self.updateResults(0, E0, water_depth)
             elif water_depth >= self.maxdepth:
                 if self.open_chan:
-                    raise ValueError("over tops")
+                    raise ValueError("over tops past ch. " + str(delta_chain))
                 delta_L = i * (self.length / 100.0)
                 # print(delta_L, water_depth)
                 wet_perimeter = self.conduitPerimeter()
@@ -194,7 +195,7 @@ class Conduit:
                 E_upstream = E0 + delta_L * Sf
                 water_depth = E_upstream - velocity**2 / (2 * Conduit.g)
                 if water_depth > self.maxdepth and self.open_chan:
-                    raise ValueError("over tops")
+                    raise ValueError("over tops past ch. " + str(delta_chain))
                 # print(water_depth)
                 E_previous = E_upstream
                 E2 = E_previous
