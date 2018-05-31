@@ -210,7 +210,7 @@ class Conduit:
                 Sf_previous = Sf
                 previous_depth = water_depth
                 delta_chain += delta_L
-                self.updateResults(delta_chain, E2, water_depth)
+                self.updateResults(delta_chain, E2, water_depth, False)
             else:
                 delta_L = i * (self.length / 100.0)
                 upper = self.maxdepth
@@ -256,12 +256,17 @@ class Conduit:
             self.updateResults(delta_chain, E2, water_depth)
         return E2
 
-    def updateResults(self, delta_chain, energy, water_depth):
+    def updateResults(self, delta_chain, energy, water_depth, include_gradient=True):
         self.chainage.append(delta_chain)
-        self.energy.append(self.ds_invert + delta_chain * self.slope + energy)
-        self.water.append(water_depth)
-        self.head.append(self.ds_invert +
-            delta_chain * self.slope + water_depth)
+        if include_gradient:
+            self.energy.append(self.ds_invert + delta_chain * self.slope + energy)
+            self.water.append(water_depth)
+            self.head.append(self.ds_invert +
+                delta_chain * self.slope + water_depth)
+        else:
+            self.energy.append(self.ds_invert + energy)
+            self.water.append(water_depth - delta_chain * self.slope)
+            self.head.append(self.ds_invert + water_depth)
 
     def clearResults(self):
         del self.chainage[:]
