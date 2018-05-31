@@ -113,11 +113,11 @@ class Conduit:
         pass
 
     @abstractmethod
-    def conduitArea(self):
+    def getConduitArea(self):
         pass
 
     @abstractmethod
-    def conduitPerimeter(self):
+    def getConduitPerimeter(self):
         pass
 
     def normal_depth(self):
@@ -127,9 +127,14 @@ class Conduit:
             # raise ValueError("check slope")
             return None
         # include loop counter, need better way than 2 x max depth. not good
-        upper = 2.0 * self.maxdepth
+        if self.open_chan:
+            upper = 2 * self.maxdepth
+        else:
+            upper = self.maxdepth
+        # upper = self.maxdepth
         lower = 0.0
         solution = False
+        count = 0
         while not solution:
             normal_depth = (upper + lower) / 2.0
             area = self.getFlowArea(normal_depth)
@@ -146,6 +151,9 @@ class Conduit:
                 upper = normal_depth
             else:
                 lower = normal_depth
+            count += 1
+            if count > Conduit.MAX_ITER:
+                return None
         return normal_depth
 
     def backwater(self):
@@ -162,8 +170,8 @@ class Conduit:
                 if water_depth > self.maxdepth:
                     if self.open_chan:
                         raise ValueError("over tops past ch. " + str(delta_chain))
-                    wet_perimeter = self.conduitPerimeter()
-                    area = self.conduitArea()
+                    wet_perimeter = self.getConduitPerimeter()
+                    area = self.getConduitArea()
                 else:
                     wet_perimeter = self.getFlowPerimeter(water_depth)
                     area = self.getFlowArea(water_depth)
@@ -185,8 +193,8 @@ class Conduit:
                     raise ValueError("over tops past ch. " + str(delta_chain))
                 delta_L = i * (self.length / 100.0)
                 # print(delta_L, water_depth)
-                wet_perimeter = self.conduitPerimeter()
-                area = self.conduitArea()
+                wet_perimeter = self.getConduitPerimeter()
+                area = self.getConduitArea()
                 hyd_radius = area / wet_perimeter
                 velocity = self.flow / area
                 E0 = water_depth + (velocity**2 / (2 * Conduit.g))
