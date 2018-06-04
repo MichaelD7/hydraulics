@@ -197,20 +197,22 @@ class Conduit:
                 area = self.getConduitArea()
                 hyd_radius = area / wet_perimeter
                 velocity = self.flow / area
-                E0 = water_depth + (velocity**2 / (2 * Conduit.g))
+                # E0 = water_depth + (velocity**2 / (2 * Conduit.g))
                 # print(E0)
                 Sf = self.friction_formula.frictionSlope(hyd_radius, velocity)
-                E_upstream = E0 + delta_L * Sf
+                E_upstream = E_previous + delta_L * Sf
                 water_depth = E_upstream - velocity**2 / (2 * Conduit.g)
                 if water_depth > self.maxdepth and self.open_chan:
                     raise ValueError("over tops past ch. " + str(delta_chain))
                 # print(water_depth)
+                delta_chain += delta_L
+                self.updateResults(delta_chain, (E_upstream - E_previous),
+                 (water_depth - previous_depth), False)
                 E_previous = E_upstream
-                E2 = E_previous
+                # E2 = E_previous
                 Sf_previous = Sf
                 previous_depth = water_depth
-                delta_chain += delta_L
-                self.updateResults(delta_chain, E2, water_depth, False)
+
             else:
                 delta_L = i * (self.length / 100.0)
                 upper = self.maxdepth
@@ -258,15 +260,20 @@ class Conduit:
 
     def updateResults(self, delta_chain, energy, water_depth, include_gradient=True):
         self.chainage.append(delta_chain)
-        if include_gradient:
+        if delta_chain == 0:
+            self.energy.append(self.ds_invert + energy)
+            self.water.append(water_depth)
+            self.head.append(self.ds_invert + water_depth)
+        elif include_gradient:
             self.energy.append(self.ds_invert + delta_chain * self.slope + energy)
             self.water.append(water_depth)
             self.head.append(self.ds_invert +
                 delta_chain * self.slope + water_depth)
         else:
-            self.energy.append(self.ds_invert + energy)
-            self.water.append(water_depth - delta_chain * self.slope)
-            self.head.append(self.ds_invert + water_depth)
+            self.energy.append(self.energy[-1] + energy)
+            self.water.append(self.water[-1] + water_depth
+            - (self.chainage[-1] - self.chainage[-2]) * self.slope)
+            self.head.append(self.head[-1] + water_depth)
 
     def clearResults(self):
         del self.chainage[:]
