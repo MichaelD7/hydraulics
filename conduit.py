@@ -256,7 +256,7 @@ class Conduit:
                 (2 * Conduit.g))
             E2 += self.us_discont
             self.updateResults(delta_chain, E2, water_depth)
-        return E2
+        return 0
 
     def updateResults(self, delta_chain, energy, water_depth, include_gradient=True):
         self.chainage.append(delta_chain)
