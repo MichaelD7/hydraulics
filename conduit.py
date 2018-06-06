@@ -178,10 +178,15 @@ class Conduit:
                 hyd_radius = area / wet_perimeter
                 velocity = self.flow / area
                 self.ds_velocity = velocity
-                self.ds_discont = self.ds_K * (self.ds_velocity**2 /
-                    (2 * Conduit.g))
+                #  set downstream K to 0 for crit depth
+                if water_depth == self.crit_depth:
+                    self.ds_discont = 0
+                else:
+                    self.ds_discont = self.ds_K * (self.ds_velocity**2 /
+                        (2 * Conduit.g))
                 E0 = water_depth + (velocity**2 /
                     (2 * Conduit.g)) + self.ds_discont
+                # TODO update water_depth based on updated energy level??
                 # Sf = slope of hydraulic gradient
                 Sf = self.friction_formula.frictionSlope(hyd_radius, velocity)
                 # print("E0: %.3f" % E0, " Sf: %.3f" % Sf)
@@ -254,8 +259,12 @@ class Conduit:
         if self.us_K:
             self.us_discont = self.us_K * (self.us_velocity**2 /
                 (2 * Conduit.g))
-            E2 += self.us_discont
-            self.updateResults(delta_chain, E2, water_depth)
+            E_previous += self.us_discont
+            self.chainage.append(delta_chain)
+            self.energy.append(self.energy[-1] + self.us_discont)
+            self.water.append(self.water[-1])
+            self.head.append(self.head[-1])
+        #    self.updateResults(delta_chain, E_previous, water_depth)
         return 0
 
     def updateResults(self, delta_chain, energy, water_depth, include_gradient=True):
