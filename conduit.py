@@ -13,15 +13,15 @@ class Conduit:
     MAX_ITER = 29
 
     def __init__(self):
-        self.flow = None
+        self.__flow = None
     #    self.width = None
     #    self.depth = None
-        self.length = None
-        self.us_invert = None
-        self.ds_invert = None
-        self.slope = None
-        self.Ks = None
-        self.kinvisc = None
+        self.__length = None
+        self.__us_invert = None
+        self.__ds_invert = None
+        self.__slope = None
+        self.__Ks = None
+        self.__kinvisc = None
         self.ds_depth = None
         self.maxdepth = None
         self.chainage = []
@@ -39,19 +39,21 @@ class Conduit:
         self.us_velocity = None
         self.ds_velocity = None
 
-
+    @property
+    def flow(self):
+        return self.__flow
 
     def setValues(self, flow, length, us_il, ds_il, Ks, kinvisc,
-     ds_depth=0, open_chan=True, friction_formula="DWCW", us_K=0, ds_K=0):
-        self.flow = self.checkValues(flow, True)
+                  ds_depth=0, open_chan=True, friction_formula="DWCW", us_K=0, ds_K=0):
+        self.__flow = self.checkValues(flow, True)
     #    self.width = self.checkValues(width, True)
     #    self.depth = self.checkValues(depth, True)
-        self.length = self.checkValues(length, True)
-        self.us_invert = self.checkValues(us_il)
-        self.ds_invert = self.checkValues(ds_il)
-        self.slope = (self.us_invert - self.ds_invert) / self.length
-        self.Ks = self.checkValues(Ks, True)
-        self.kinvisc = self.checkValues(kinvisc, True)
+        self.__length = self.checkValues(length, True)
+        self.__us_invert = self.checkValues(us_il)
+        self.__ds_invert = self.checkValues(ds_il)
+        self.__slope = (self.__us_invert - self.__ds_invert) / self.__length
+        self.__Ks = self.checkValues(Ks, True)
+        self.__kinvisc = self.checkValues(kinvisc, True)
         self.ds_depth = self.checkValues(ds_depth, True)
         self.open_chan = open_chan
         self.friction_formula = self.setFrictionModel(friction_formula)
@@ -62,7 +64,7 @@ class Conduit:
 
     def setFrictionModel(self, friction_formula):
         if friction_formula == "DWCW":
-            friction_model = friction.DarcyWeisbach(self.Ks, self.kinvisc)
+            friction_model = friction.DarcyWeisbach(self.__Ks, self.__kinvisc)
         return friction_model
 
     def checkValues(self, checkValue, non_negative=False):
@@ -87,7 +89,7 @@ class Conduit:
             Hcrit = (upper + lower) / 2.0
             area = self.getFlowArea(Hcrit)
             top_width = self.getFlowTopWidth(Hcrit)
-            froude = self.flow**2 * top_width / (Conduit.g * area**3)
+            froude = self.__flow**2 * top_width / (Conduit.g * area**3)
             if math.fabs(froude - 1.0) < Conduit.precision:
                 solution = True
             elif froude > 1.0:
@@ -123,7 +125,7 @@ class Conduit:
     def normal_depth(self):
         """calculate normal depth for conduit"""
         # check for flat slope
-        if self.slope <= 0.0001:
+        if self.__slope <= 0.0001:
             # raise ValueError("check slope")
             return None
         # include loop counter, need better way than 2 x max depth. not good
@@ -139,15 +141,15 @@ class Conduit:
             normal_depth = (upper + lower) / 2.0
             area = self.getFlowArea(normal_depth)
             perimeter = self.getFlowPerimeter(normal_depth)
-            vel_norm = self.flow / area
+            vel_norm = self.__flow / area
             hydraulic_radius = area / perimeter
             friction_factor = self.friction_formula.friction_factor(
                 hydraulic_radius, vel_norm)
-            calc_flow = math.pow((self.slope * 4.0 * hydraulic_radius *
-                area * area * 2.0 * Conduit.g / friction_factor), 0.5)
-            if math.fabs(self.flow - calc_flow) < Conduit.precision:
+            calc_flow = math.pow((self.__slope * 4.0 * hydraulic_radius *
+                                 area * area * 2.0 * Conduit.g / friction_factor), 0.5)
+            if math.fabs(self.__flow - calc_flow) < Conduit.precision:
                 solution = True
-            elif calc_flow > self.flow:
+            elif calc_flow > self.__flow:
                 upper = normal_depth
             else:
                 lower = normal_depth
@@ -176,7 +178,7 @@ class Conduit:
                     wet_perimeter = self.getFlowPerimeter(water_depth)
                     area = self.getFlowArea(water_depth)
                 hyd_radius = area / wet_perimeter
-                velocity = self.flow / area
+                velocity = self.__flow / area
                 self.ds_velocity = velocity
                 #  set downstream K to 0 for crit depth
                 if water_depth == self.crit_depth:
@@ -196,12 +198,12 @@ class Conduit:
             elif water_depth >= self.maxdepth:
                 if self.open_chan:
                     raise ValueError("over tops past ch. " + str(delta_chain))
-                delta_L = i * (self.length / 100.0)
+                delta_L = i * (self.__length / 100.0)
                 # print(delta_L, water_depth)
                 wet_perimeter = self.getConduitPerimeter()
                 area = self.getConduitArea()
                 hyd_radius = area / wet_perimeter
-                velocity = self.flow / area
+                velocity = self.__flow / area
                 # E0 = water_depth + (velocity**2 / (2 * Conduit.g))
                 # print(E0)
                 Sf = self.friction_formula.frictionSlope(hyd_radius, velocity)
@@ -219,7 +221,7 @@ class Conduit:
                 previous_depth = water_depth
 
             else:
-                delta_L = i * (self.length / 100.0)
+                delta_L = i * (self.__length / 100.0)
                 upper = self.maxdepth
                 lower = previous_depth
 
@@ -230,11 +232,11 @@ class Conduit:
                     area = self.getFlowArea(water_depth)
                     wet_perimeter = self.getFlowPerimeter(water_depth)
                     hyd_radius = area / wet_perimeter
-                    velocity = self.flow / area
+                    velocity = self.__flow / area
                     E_upstream = water_depth + (velocity**2 / (2 * Conduit.g))
                     Sf = self.friction_formula.frictionSlope(hyd_radius, velocity)
                     Sf_mean = (Sf + Sf_previous) / 2.0
-                    E2 = E_previous - delta_L * (self.slope - Sf_mean)
+                    E2 = E_previous - delta_L * (self.__slope - Sf_mean)
                     # print("check", E_upstream, E2)
                     if math.fabs(E_upstream - E2) < Conduit.precision:
                         solution = True
@@ -270,18 +272,18 @@ class Conduit:
     def updateResults(self, delta_chain, energy, water_depth, include_gradient=True):
         self.chainage.append(delta_chain)
         if delta_chain == 0:
-            self.energy.append(self.ds_invert + energy)
+            self.energy.append(self.__ds_invert + energy)
             self.water.append(water_depth)
-            self.head.append(self.ds_invert + water_depth)
+            self.head.append(self.__ds_invert + water_depth)
         elif include_gradient:
-            self.energy.append(self.ds_invert + delta_chain * self.slope + energy)
+            self.energy.append(self.__ds_invert + delta_chain * self.__slope + energy)
             self.water.append(water_depth)
-            self.head.append(self.ds_invert +
-                delta_chain * self.slope + water_depth)
+            self.head.append(self.__ds_invert +
+                delta_chain * self.__slope + water_depth)
         else:
             self.energy.append(self.energy[-1] + energy)
             self.water.append(self.water[-1] + water_depth
-            - (self.chainage[-1] - self.chainage[-2]) * self.slope)
+            - (self.chainage[-1] - self.chainage[-2]) * self.__slope)
             self.head.append(self.head[-1] + water_depth)
 
     def clearResults(self):
@@ -297,7 +299,7 @@ class Conduit:
             self.crit_depth = self.critical_depth()
             # calculate normal depth
             self.norm_depth = self.normal_depth()
-            # print(self.slope)
+            # print(self.__slope)
             # TODO figure out how to handle downstream depth greater than normal depth
     #        if self.ds_depth > self.norm_depth:
     #            return
