@@ -1,0 +1,40 @@
+Test Run 9
+0.8605894996689347
+1.1255035400390625
+Length 0.0 Energy 2.271 Water 0.861 Head 1.841
+Length 0.1 Energy 2.271 Water 0.869 Head 1.849
+Length 0.1 Energy 2.271 Water 0.873 Head 1.853
+Length 0.2 Energy 2.272 Water 0.877 Head 1.858
+Length 0.5 Energy 2.273 Water 0.886 Head 1.867
+Length 0.8 Energy 2.274 Water 0.890 Head 1.871
+Length 1.2 Energy 2.276 Water 0.898 Head 1.880
+Length 1.8 Energy 2.278 Water 0.904 Head 1.888
+Length 2.8 Energy 2.281 Water 0.915 Head 1.901
+Length 3.8 Energy 2.285 Water 0.923 Head 1.911
+Length 4.8 Energy 2.288 Water 0.931 Head 1.920
+Length 5.8 Energy 2.291 Water 0.937 Head 1.928
+Length 6.8 Energy 2.295 Water 0.942 Head 1.935
+Length 7.8 Energy 2.298 Water 0.947 Head 1.943
+Length 8.8 Energy 2.301 Water 0.952 Head 1.949
+Length 9.8 Energy 2.304 Water 0.956 Head 1.956
+Length 10.0 Energy 2.305 Water 0.957 Head 1.957
+Test Run 4
+0.34152516927181337
+None
+Length 0.0 Energy 1.512 Water 0.342 Head 1.342
+Length 0.6 Energy 1.516 Water 0.372 Head 1.372
+Length 1.2 Energy 1.519 Water 0.384 Head 1.384
+Length 2.5 Energy 1.525 Water 0.401 Head 1.401
+Length 5.0 Energy 1.535 Water 0.424 Head 1.424
+Length 7.5 Energy 1.544 Water 0.442 Head 1.442
+Length 12.5 Energy 1.559 Water 0.469 Head 1.469
+Length 17.5 Energy 1.573 Water 0.490 Head 1.490
+Length 27.5 Energy 1.597 Water 0.524 Head 1.524
+Length 37.5 Energy 1.617 Water 0.552 Head 1.552
+Length 47.5 Energy 1.635 Water 0.575 Head 1.575
+Length 57.5 Energy 1.651 Water 0.595 Head 1.595
+Length 67.5 Energy 1.666 Water 0.614 Head 1.614
+Length 77.5 Energy 1.680 Water 0.630 Head 1.630
+Length 87.5 Energy 1.694 Water 0.646 Head 1.646
+Length 97.5 Energy 1.706 Water 0.660 Head 1.660
+Length 100.0 Energy 1.709 Water 0.664 Head 1.664
