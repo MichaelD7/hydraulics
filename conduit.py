@@ -65,6 +65,9 @@ class Conduit:
     def setFrictionModel(self, friction_formula):
         if friction_formula == "DWCW":
             friction_model = friction.DarcyWeisbach(self.__Ks, self.__kinvisc)
+        elif friction_formula == "MANNING":
+            friction_model = friction.Manning(self.__Ks)
+
         return friction_model
 
     def checkValues(self, checkValue, non_negative=False):
@@ -142,11 +145,12 @@ class Conduit:
             area = self.getFlowArea(normal_depth)
             perimeter = self.getFlowPerimeter(normal_depth)
             vel_norm = self.__flow / area
-            hydraulic_radius = area / perimeter
-            friction_factor = self.friction_formula.friction_factor(
-                hydraulic_radius, vel_norm)
-            calc_flow = math.pow((self.__slope * 4.0 * hydraulic_radius *
-                                 area * area * 2.0 * Conduit.g / friction_factor), 0.5)
+        #    hydraulic_radius = area / perimeter
+        #    friction_factor = self.friction_formula.friction_factor(
+        #        hydraulic_radius, vel_norm)
+            # calc_flow = math.pow((self.__slope * 4.0 * hydraulic_radius *
+            #                     area * area * 2.0 * Conduit.g / friction_factor), 0.5)
+            calc_flow = self.friction_formula.flowRate(self.__slope, area, perimeter, vel_norm)
             if math.fabs(self.__flow - calc_flow) < Conduit.precision:
                 solution = True
             elif calc_flow > self.__flow:
@@ -190,7 +194,7 @@ class Conduit:
                     (2 * Conduit.g)) + self.ds_discont
                 # TODO update water_depth based on updated energy level??
                 # Sf = slope of hydraulic gradient
-                Sf = self.friction_formula.frictionSlope(hyd_radius, velocity)
+                Sf = self.friction_formula.frictionSlope(area, wet_perimeter, velocity)
                 # print("E0: %.3f" % E0, " Sf: %.3f" % Sf)
                 E_previous = E0
                 Sf_previous = Sf
@@ -202,11 +206,11 @@ class Conduit:
                 # print(delta_L, water_depth)
                 wet_perimeter = self.getConduitPerimeter()
                 area = self.getConduitArea()
-                hyd_radius = area / wet_perimeter
+            #    hyd_radius = area / wet_perimeter
                 velocity = self.__flow / area
                 # E0 = water_depth + (velocity**2 / (2 * Conduit.g))
                 # print(E0)
-                Sf = self.friction_formula.frictionSlope(hyd_radius, velocity)
+                Sf = self.friction_formula.frictionSlope(area, wet_perimeter, velocity)
                 E_upstream = E_previous + delta_L * Sf
                 water_depth = E_upstream - velocity**2 / (2 * Conduit.g)
                 if water_depth > self.maxdepth and self.open_chan:
@@ -231,10 +235,10 @@ class Conduit:
                     water_depth = (upper + lower) / 2.0
                     area = self.getFlowArea(water_depth)
                     wet_perimeter = self.getFlowPerimeter(water_depth)
-                    hyd_radius = area / wet_perimeter
+                #    hyd_radius = area / wet_perimeter
                     velocity = self.__flow / area
                     E_upstream = water_depth + (velocity**2 / (2 * Conduit.g))
-                    Sf = self.friction_formula.frictionSlope(hyd_radius, velocity)
+                    Sf = self.friction_formula.frictionSlope(area, wet_perimeter, velocity)
                     Sf_mean = (Sf + Sf_previous) / 2.0
                     E2 = E_previous - delta_L * (self.__slope - Sf_mean)
                     # print("check", E_upstream, E2)
