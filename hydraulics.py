@@ -1,7 +1,8 @@
 import sys
 import channel
 from PyQt5.QtWidgets import (QWidget, QLabel, QVBoxLayout, QApplication, 
-    QComboBox, QStackedWidget, QHBoxLayout, QLineEdit, QPushButton, QTextEdit, QRadioButton)
+                            QComboBox, QStackedWidget, QHBoxLayout, QLineEdit, QPushButton,
+                            QTextEdit, QRadioButton)
 from PyQt5.QtCore import *
 
 
@@ -82,6 +83,7 @@ class Application(QWidget):
         layout2.addWidget(QLabel("Length"))
         layout2.addWidget(self.lengthEdit)
         layout2.addWidget(QLabel("m"))
+        layout2.addStretch()
         layout3 = QHBoxLayout()
         layout3.addWidget(QLabel("Upstream IL"))
         layout3.addWidget(self.usInvert)
