@@ -38,6 +38,16 @@ class TestPipe(unittest.TestCase):
         self.assertAlmostEqual(self.pipe1.energy[0], 0.548, 3)
         self.assertAlmostEqual(self.pipe1.energy[-1], 1.548, 3)
 
+    # Level slope
+    def test_run4(self):
+        self.pipe1.setValues(0.5, 1.0, 100.0, 1.0, 1.0, 0.003, 1.141e-06, 0.4,
+                             False, "DWCW", 0, 0)
+        self.pipe1.calculate()
+        self.assertAlmostEqual(self.pipe1.crit_depth, 0.399, 3)
+        self.assertAlmostEqual(self.pipe1.norm_depth, None, 3)
+        self.assertAlmostEqual(self.pipe1.energy[0], 1.548, 3)
+        self.assertAlmostEqual(self.pipe1.energy[-1], 1.698, 3)
+
 
 if __name__ == '__main__':
     unittest.main()
