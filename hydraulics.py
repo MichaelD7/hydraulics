@@ -1,8 +1,8 @@
 import sys
 import channel
 from PyQt5.QtWidgets import (QWidget, QLabel, QVBoxLayout, QApplication, 
-                            QComboBox, QStackedWidget, QHBoxLayout, QLineEdit, QPushButton,
-                            QTextEdit, QRadioButton)
+                             QComboBox, QStackedWidget, QHBoxLayout, QLineEdit, 
+                             QPushButton, QTextEdit, QRadioButton)
 from PyQt5.QtCore import *
 
 
@@ -58,7 +58,6 @@ class Application(QWidget):
         self.stack1UI()
         self.stack2UI()
         self.stack3UI()
-
 
         self.stack = QStackedWidget(self)
         self.stack.addWidget(self.stack1)
@@ -205,12 +204,13 @@ class Application(QWidget):
             print("error")
             pass
 
-#	    if self.pipeShape.currentIndex() == 0:
-#	        self.result.setText(self.circleDiameter.text())
-#	    elif self.pipeShape.currentIndex() == 1:
-#		    self.result.setText(self.rectWidth.text())
-#	    else:
-#		    self.result.setText(self.trapWidth.text())
+        # if self.pipeShape.currentIndex() == 0:
+        #   self.result.setText(self.circleDiameter.text())
+        # elif self.pipeShape.currentIndex() == 1:
+        #   self.result.setText(self.rectWidth.text())
+        # else:
+        #   self.result.setText(self.trapWidth.text())
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -1,6 +1,7 @@
 import conduit
 import math
 
+
 class Pipe(conduit.Conduit):
 
     def __init__(self):
@@ -9,11 +10,11 @@ class Pipe(conduit.Conduit):
         super().__init__()
 
     def setValues(self, flow, diameter, length, us_il, ds_il,
-        Ks, kinvisc, ds_depth=0, open_chan=False, friction_formula="DWCW",
-        us_K=0, ds_K=0):
+                  Ks, kinvisc, ds_depth=0, open_chan=False,
+                  friction_formula="DWCW", us_K=0, ds_K=0):
         self.diameter = self.checkValues(diameter, True)
         super().setValues(flow, length, us_il, ds_il, Ks, kinvisc,
-        ds_depth, open_chan, friction_formula, us_K, ds_K)
+                          ds_depth, open_chan, friction_formula, us_K, ds_K)
 
     def partPipe(self, guess_depth):
         """calculate angle based on guessed depth of flow"""
