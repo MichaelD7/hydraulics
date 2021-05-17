@@ -63,11 +63,11 @@ class Application(QWidget):
         self.stack.addWidget(self.stack1)
         self.stack.addWidget(self.stack2)
         self.stack.addWidget(self.stack3)
-        
+
         layout = QVBoxLayout()
         layout.addWidget(QLabel("Select Pipe Shape:"))
         layout.addWidget(self.pipeShape)
-        
+
         layout.addWidget(self.stack)
         layoutFlow = QHBoxLayout()
         layoutFlow.addWidget(QLabel("Flow Rate:"))
@@ -119,7 +119,7 @@ class Application(QWidget):
         topLayout = QHBoxLayout(self)
         topLayout.addLayout(layout)
         topLayout.addLayout(layout1)
-       
+
         self.setLayout(topLayout)
         self.pipeShape.currentIndexChanged.connect(self.stack.setCurrentIndex)
         self.setGeometry(100, 100, 670, 500)
@@ -175,7 +175,7 @@ class Application(QWidget):
         layout.addLayout(layout4)
         layout.setAlignment(Qt.AlignTop)
         self.stack3.setLayout(layout)
-    
+
     def calculate(self):
         try:
             flow = float(self.flow.text())

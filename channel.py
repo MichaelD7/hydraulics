@@ -1,6 +1,7 @@
 import conduit
 import math
 
+
 class Channel(conduit.Conduit):
 
     def __init__(self):
@@ -8,20 +9,19 @@ class Channel(conduit.Conduit):
         self.width = None
         self.depth = None
 
-
-    def setValues(self, flow, width, depth,length, us_il,
-        ds_il, Ks, kinvisc, ds_depth=0, open_chan=True,
-        friction_formula="DWCW", us_K=0, ds_K=0):
+    def setValues(self, flow, width, depth, length, us_il,
+                  ds_il, Ks, kinvisc, ds_depth=0, open_chan=True,
+                  friction_formula="DWCW", us_K=0, ds_K=0):
         self.width = self.checkValues(width, True)
         self.depth = self.checkValues(depth, True)
         super().setValues(flow, length, us_il, ds_il, Ks, kinvisc,
-        ds_depth, open_chan, friction_formula, us_K, ds_K)
+                          ds_depth, open_chan, friction_formula, us_K, ds_K)
 
-#override base class, but not needed
+# override base class, but not needed
     def critical_depth(self):
         """calculate critical depth for channel"""
         crit_depth = math.pow((self.flow**2 /
-            (self.width **2 * Channel.g)), (1/3))
+                              (self.width ** 2 * Channel.g)), (1/3))
         return crit_depth
 
     def max_depth(self):

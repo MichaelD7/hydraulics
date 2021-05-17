@@ -2,12 +2,13 @@ import math
 import friction
 from abc import ABCMeta, abstractmethod
 
+
 class Conduit:
     __metaclass__ = ABCMeta
 
     """set step lengths, define defaults"""
     step = (0, 0.625, 0.625, 1.25, 2.5, 2.5, 5, 5, 10,
-        10, 10, 10, 10, 10, 10, 10, 2.5)
+            10, 10, 10, 10, 10, 10, 10, 2.5)
     g = 9.806   # gravitational constant
     precision = 0.0001
     MAX_ITER = 29
@@ -44,7 +45,8 @@ class Conduit:
         return self.__flow
 
     def setValues(self, flow, length, us_il, ds_il, Ks, kinvisc,
-                  ds_depth=0, open_chan=True, friction_formula="DWCW", us_K=0, ds_K=0):
+                  ds_depth=0, open_chan=True, friction_formula="DWCW",
+                  us_K=0, ds_K=0):
         self.__flow = self.checkValues(flow, True)
     #    self.width = self.checkValues(width, True)
     #    self.depth = self.checkValues(depth, True)
@@ -81,7 +83,6 @@ class Conduit:
             print("can't be negative", e)
             pass
         return checkValue
-
 
     def critical_depth(self):
         """Calculate critical depth"""
@@ -149,8 +150,9 @@ class Conduit:
         #    friction_factor = self.friction_formula.friction_factor(
         #        hydraulic_radius, vel_norm)
             # calc_flow = math.pow((self.__slope * 4.0 * hydraulic_radius *
-            #                     area * area * 2.0 * Conduit.g / friction_factor), 0.5)
-            calc_flow = self.friction_formula.flowRate(self.__slope, area, perimeter, vel_norm)
+            #        area * area * 2.0 * Conduit.g / friction_factor), 0.5)
+            calc_flow = self.friction_formula.flowRate(self.__slope, area,
+                                                       perimeter, vel_norm)
             if math.fabs(self.__flow - calc_flow) < Conduit.precision:
                 solution = True
             elif calc_flow > self.__flow:
@@ -175,7 +177,8 @@ class Conduit:
                 # check for conduit full
                 if water_depth > self.maxdepth:
                     if self.open_chan:
-                        raise ValueError("over tops past ch. " + str(delta_chain))
+                        raise ValueError("over tops past ch. " +
+                                         str(delta_chain))
                     wet_perimeter = self.getConduitPerimeter()
                     area = self.getConduitArea()
                 else:
@@ -189,12 +192,13 @@ class Conduit:
                     self.ds_discont = 0
                 else:
                     self.ds_discont = self.ds_K * (self.ds_velocity**2 /
-                        (2 * Conduit.g))
+                                                   (2 * Conduit.g))
                 E0 = water_depth + (velocity**2 /
-                    (2 * Conduit.g)) + self.ds_discont
+                                    (2 * Conduit.g)) + self.ds_discont
                 # TODO update water_depth based on updated energy level??
                 # Sf = slope of hydraulic gradient
-                Sf = self.friction_formula.frictionSlope(area, wet_perimeter, velocity)
+                Sf = self.friction_formula.frictionSlope(area, wet_perimeter,
+                                                         velocity)
                 # print("E0: %.3f" % E0, " Sf: %.3f" % Sf)
                 E_previous = E0
                 Sf_previous = Sf
@@ -210,7 +214,8 @@ class Conduit:
                 velocity = self.__flow / area
                 # E0 = water_depth + (velocity**2 / (2 * Conduit.g))
                 # print(E0)
-                Sf = self.friction_formula.frictionSlope(area, wet_perimeter, velocity)
+                Sf = self.friction_formula.frictionSlope(area, wet_perimeter,
+                                                         velocity)
                 E_upstream = E_previous + delta_L * Sf
                 water_depth = E_upstream - velocity**2 / (2 * Conduit.g)
                 if water_depth > self.maxdepth and self.open_chan:
@@ -218,7 +223,7 @@ class Conduit:
                 # print(water_depth)
                 delta_chain += delta_L
                 self.updateResults(delta_chain, (E_upstream - E_previous),
-                 (water_depth - previous_depth), False)
+                                   (water_depth - previous_depth), False)
                 E_previous = E_upstream
                 # E2 = E_previous
                 Sf_previous = Sf
@@ -238,7 +243,9 @@ class Conduit:
                 #    hyd_radius = area / wet_perimeter
                     velocity = self.__flow / area
                     E_upstream = water_depth + (velocity**2 / (2 * Conduit.g))
-                    Sf = self.friction_formula.frictionSlope(area, wet_perimeter, velocity)
+                    Sf = self.friction_formula.frictionSlope(area,
+                                                             wet_perimeter,
+                                                             velocity)
                     Sf_mean = (Sf + Sf_previous) / 2.0
                     E2 = E_previous - delta_L * (self.__slope - Sf_mean)
                     # print("check", E_upstream, E2)
@@ -260,11 +267,12 @@ class Conduit:
                 delta_chain += delta_L
                 self.updateResults(delta_chain, E2, water_depth)
                 # print("Friction: %.4f" % friction_factor)
-                # print("Length %.1f" % delta_chain, "E2: %.3f" % E_previous, " Sf: %.3f" % Sf_previous)
+                # print("Length %.1f" % delta_chain, "E2: %.3f" % E_previous,
+                # " Sf: %.3f" % Sf_previous)
         self.us_velocity = velocity
         if self.us_K:
             self.us_discont = self.us_K * (self.us_velocity**2 /
-                (2 * Conduit.g))
+                                           (2 * Conduit.g))
             E_previous += self.us_discont
             self.chainage.append(delta_chain)
             self.energy.append(self.energy[-1] + self.us_discont)
@@ -273,21 +281,24 @@ class Conduit:
         #    self.updateResults(delta_chain, E_previous, water_depth)
         return 0
 
-    def updateResults(self, delta_chain, energy, water_depth, include_gradient=True):
+    def updateResults(self, delta_chain, energy, water_depth,
+                      include_gradient=True):
         self.chainage.append(delta_chain)
         if delta_chain == 0:
             self.energy.append(self.__ds_invert + energy)
             self.water.append(water_depth)
             self.head.append(self.__ds_invert + water_depth)
         elif include_gradient:
-            self.energy.append(self.__ds_invert + delta_chain * self.__slope + energy)
+            self.energy.append(self.__ds_invert + delta_chain *
+                               self.__slope + energy)
             self.water.append(water_depth)
             self.head.append(self.__ds_invert +
-                delta_chain * self.__slope + water_depth)
+                             delta_chain * self.__slope + water_depth)
         else:
             self.energy.append(self.energy[-1] + energy)
-            self.water.append(self.water[-1] + water_depth
-            - (self.chainage[-1] - self.chainage[-2]) * self.__slope)
+            self.water.append(self.water[-1] + water_depth -
+                              (self.chainage[-1] - self.chainage[-2]) *
+                              self.__slope)
             self.head.append(self.head[-1] + water_depth)
 
     def clearResults(self):
@@ -304,7 +315,8 @@ class Conduit:
             # calculate normal depth
             self.norm_depth = self.normal_depth()
             # print(self.__slope)
-            # TODO figure out how to handle downstream depth greater than normal depth
+            # TODO figure out how to handle downstream depth greater
+            # than normal depth
     #        if self.ds_depth > self.norm_depth:
     #            return
             if self.norm_depth is None:

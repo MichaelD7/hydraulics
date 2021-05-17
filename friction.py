@@ -2,9 +2,10 @@ import math
 
 from abc import ABCMeta, abstractmethod
 
+
 class FrictionLoss:
     __metaclass__ = ABCMeta
-    g = 9.806   #gravitational constant
+    g = 9.806   # gravitational constant
     precision = 0.0001
     MAX_ITER = 29
 
@@ -20,6 +21,7 @@ class FrictionLoss:
     def flowRate(self, slope, area, perimeter, velocity):
         pass
 
+
 class DarcyWeisbach(FrictionLoss):
     def __init__(self, roughness, kinvisc):
         self.roughness = roughness
@@ -33,8 +35,10 @@ class DarcyWeisbach(FrictionLoss):
         # Re = dia * vel_norm / self.kinvisc
         solution = False
         while not solution:
-            friction = 0.25 * math.pow(math.log10(self.roughness / (3.7 * dia) +
-                2.51 / (velocity * dia / self.kinvisc * math.sqrt(guess))),-2)
+            friction = 0.25 * math.pow(math.log10(self.roughness /
+                                       (3.7 * dia) + 2.51 /
+                                       (velocity * dia / self.kinvisc *
+                                        math.sqrt(guess))), -2)
             if math.fabs(friction - guess) < FrictionLoss.precision:
                 solution = True
             else:
@@ -52,8 +56,10 @@ class DarcyWeisbach(FrictionLoss):
         hydraulic_radius = area / perimeter
         friction_factor = self.friction_factor(hydraulic_radius, velocity)
         flow = math.pow((slope * 4.0 * hydraulic_radius *
-                        area * area * 2.0 * FrictionLoss.g / friction_factor), 0.5)
+                        area * area * 2.0 * FrictionLoss.g /
+                        friction_factor), 0.5)
         return flow
+
 
 class Manning(FrictionLoss):
     def __init__(self, roughness):
