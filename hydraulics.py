@@ -1,9 +1,9 @@
 import sys
 import channel
-from PyQt5.QtWidgets import (QWidget, QLabel, QVBoxLayout, QApplication, 
-                             QComboBox, QStackedWidget, QHBoxLayout, QLineEdit, 
+from PySide6.QtWidgets import (QWidget, QLabel, QVBoxLayout, QApplication,
+                               QComboBox, QStackedWidget, QHBoxLayout, QLineEdit,
                              QPushButton, QTextEdit, QRadioButton)
-from PyQt5.QtCore import *
+from PySide6.QtCore import *
 
 
 class Application(QWidget):
@@ -215,4 +215,4 @@ class Application(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = Application()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
